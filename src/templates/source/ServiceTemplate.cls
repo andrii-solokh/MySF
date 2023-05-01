@@ -13,5 +13,9 @@ public inherited sharing class {{CLASS_NAME}} implements I{{CLASS_NAME}} {
      * @param  records    
      * @param  oldRecords 
      */
-    void handleRecordUpdate(List<{{SOBJECT_NAME}}> records, Map<Id, {{SOBJECT_NAME}}> oldRecords);
+    public void handleRecordUpdate(
+        List<{{SOBJECT_NAME}}> records,
+        Map<Id, {{SOBJECT_NAME}}> oldRecords
+    ) {
+    }
 }

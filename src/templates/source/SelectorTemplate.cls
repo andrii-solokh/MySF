@@ -19,7 +19,7 @@ public inherited sharing class {{CLASS_NAME}} implements I{{CLASS_NAME}} {
      * @return          
      */
     public {{SOBJECT_NAME}} getById(Id recordId) {
-        String query = 'SELECT ' + String.join(fields, ',') + ' FROM Account WHERE Id = :recordId';
+        String query = 'SELECT ' + String.join(ALL_FIELD_NAMES, ',') + ' FROM Account WHERE Id = :recordId';
         return Database.query(query);
     }
 
@@ -28,7 +28,7 @@ public inherited sharing class {{CLASS_NAME}} implements I{{CLASS_NAME}} {
      * @return          
      */
     public List<{{SOBJECT_NAME}}> getAll() {
-        String query = 'SELECT ' + String.join(fields, ',') + ' FROM Account';
+        String query = 'SELECT ' + String.join(ALL_FIELD_NAMES, ',') + ' FROM Account';
         return Database.query(query);
     }
 }
