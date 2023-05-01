@@ -3,7 +3,7 @@
     "publisher": "AndriiSolokh",
     "displayName": "MySF",
     "description": "Personal SF Developer Commands",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "engines": {
         "vscode": "^1.77.0"
     },
