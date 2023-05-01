@@ -3,8 +3,8 @@
     "publisher": "AndriiSolokh",
     "displayName": "MySF",
     "description": "Personal SF Developer Commands",
-    "icon": "images/MySF-logo.png", 
-    "version": "0.1.2",
+    "icon": "images/MySF-logo.png",
+    "version": "0.1.3",
     "engines": {
         "vscode": "^1.77.0"
     },
