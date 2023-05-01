@@ -6,22 +6,19 @@ import { promises as fs } from "fs";
 export const workspacePath =
     vscode.workspace.workspaceFolders?.[0].uri.fsPath || "";
 
-const extensionPathRoot =
-    vscode.extensions.getExtension("AndriiSolokh.mysf")?.extensionPath ?? "";
+const extensionPath = __dirname;
 
-const extensionPath = path.join(extensionPathRoot, "out");
-
-export const templatesPath = path.join(extensionPath, "templates");
-export const metadataPath = path.join(templatesPath, "metadata");
-export const sourcePath = path.join(templatesPath, "source");
-export const sfdxPath = path.join(workspacePath, ".sfdx");
-export const sfdxObjectsPath = path.join(sfdxPath, "tools", "sobjects");
-export const sfdxObjectsStandardPath = path.join(
-    sfdxObjectsPath,
+export const templatesDirPath = path.join(extensionPath, "templates");
+export const metadataTemplatesDirPath = path.join(templatesDirPath, "metadata");
+export const sourceTemmplatesDirPath = path.join(templatesDirPath, "source");
+export const sfdxDirPath = path.join(workspacePath, ".sfdx");
+export const sfdxObjectsDirPath = path.join(sfdxDirPath, "tools", "sobjects");
+export const sfdxObjectsStandardDirPath = path.join(
+    sfdxObjectsDirPath,
     "standardObjects"
 );
 export const sfdxObjectsCustomPath = path.join(
-    sfdxObjectsPath,
+    sfdxObjectsDirPath,
     "customObjects"
 );
 
@@ -34,9 +31,9 @@ export const workspaceClassesPath = path.join(
 );
 
 interface FileConfig {
-    sourcePath: string;
+    sourceTemplatePath: string;
     classNameTemplate: string;
-    metadataPath: string;
+    metadataTemplatePath: string;
 }
 
 interface TemplateMetadata {
@@ -44,24 +41,30 @@ interface TemplateMetadata {
     destinationPath: string;
 }
 
-type TemplateType = "Selector" | "Trigger";
+type Presets = "Selector" | "Trigger";
 
-const TEMPLATE_MAPPING = {
+const TEMPLATE_MAPPING: { [K in Presets]: TemplateMetadata } = {
     Selector: {
         files: [
             {
-                sourcePath: path.join(sourcePath, "SelectorTemplate.cls"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "SelectorTemplate.cls"
+                ),
                 classNameTemplate: "{{NAME}}Selector",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"
                 ),
             },
             {
-                sourcePath: path.join(sourcePath, "ISelectorTemplate.cls"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "ISelectorTemplate.cls"
+                ),
                 classNameTemplate: "I{{NAME}}Selector",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"
                 ),
             },
@@ -71,42 +74,57 @@ const TEMPLATE_MAPPING = {
     Trigger: {
         files: [
             {
-                sourcePath: path.join(sourcePath, "TriggerTemplate.trigger"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "TriggerTemplate.trigger"
+                ),
                 classNameTemplate: "{{NAME}}Trigger",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "TriggerMetadata.trigger-meta.xml"
                 ),
             },
             {
-                sourcePath: path.join(sourcePath, "TriggerHandlerTemplate.cls"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "TriggerHandlerTemplate.cls"
+                ),
                 classNameTemplate: "{{NAME}}TriggerHandler",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"
                 ),
             },
             {
-                sourcePath: path.join(sourcePath, "ServiceTemplate.cls"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "ServiceTemplate.cls"
+                ),
                 classNameTemplate: "{{NAME}}Service",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"
                 ),
             },
             {
-                sourcePath: path.join(sourcePath, "IServiceTemplate.cls"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "IServiceTemplate.cls"
+                ),
                 classNameTemplate: "I{{NAME}}Service",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"
                 ),
             },
             {
-                sourcePath: path.join(sourcePath, "ServiceTestTemplate.cls"),
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "ServiceTestTemplate.cls"
+                ),
                 classNameTemplate: "{{NAME}}ServiceTest",
-                metadataPath: path.join(
-                    metadataPath,
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"
                 ),
             },
@@ -117,7 +135,7 @@ const TEMPLATE_MAPPING = {
 
 export async function askForObject() {
     const allFiles = await Promise.all([
-        fs.readdir(sfdxObjectsStandardPath),
+        fs.readdir(sfdxObjectsStandardDirPath),
         fs.readdir(sfdxObjectsCustomPath),
     ]);
     const objectFiles = allFiles.flat().filter((file) => file.endsWith(".cls"));
@@ -130,23 +148,29 @@ export async function askForObject() {
 }
 
 function getExtension(fileName: string) {
-    return "." + fileName.split(".").slice(1).join(".");
+    return "." + path.basename(fileName).split(".").slice(1).join(".");
 }
 
 export async function generateFiles(
     name: string,
-    type: TemplateType,
+    type: Presets,
     params: { [key: string]: string }
 ): Promise<string[]> {
-    const { files, destinationPath } = TEMPLATE_MAPPING[type];
+    const { files: fileMetadatas, destinationPath } = TEMPLATE_MAPPING[type];
 
     const generatedFiles = [];
-    for (const file of files) {
-        // load content
-        const { sourcePath, classNameTemplate, metadataPath } = file;
 
-        const sourceContent = await fs.readFile(sourcePath, "utf-8");
-        const metadataContent = await fs.readFile(metadataPath, "utf-8");
+    for (const fileMetadata of fileMetadatas) {
+        // load content
+        const { sourceTemplatePath, classNameTemplate, metadataTemplatePath } =
+            fileMetadata;
+
+        const sourceContent = await fs.readFile(sourceTemplatePath, "utf-8");
+
+        const metadataContent = await fs.readFile(
+            metadataTemplatePath,
+            "utf-8"
+        );
 
         // format content
         const className = classNameTemplate.replaceAll("{{NAME}}", name);
@@ -165,8 +189,8 @@ export async function generateFiles(
         }
 
         // save files
-        const fileName = className + getExtension(sourcePath);
-        const metadataFileName = className + getExtension(metadataPath);
+        const fileName = className + getExtension(sourceTemplatePath);
+        const metadataFileName = className + getExtension(metadataTemplatePath);
 
         const sourceDestinationPath = path.join(destinationPath, fileName);
 
@@ -198,7 +222,7 @@ export async function getObjectFileds(objectName: string) {
     const isCustom = objectFileName.includes("__c");
     const selectedFilePath = isCustom
         ? path.join(sfdxObjectsCustomPath, objectFileName)
-        : path.join(sfdxObjectsStandardPath, objectFileName);
+        : path.join(sfdxObjectsStandardDirPath, objectFileName);
 
     const selectedFile = await fs.readFile(selectedFilePath, "utf-8");
 

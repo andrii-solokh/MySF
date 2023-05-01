@@ -2,21 +2,15 @@
 import * as vscode from "vscode";
 import { promises as fs } from "fs";
 import {
-    generateFiles,
     askForObject,
     openFiles,
     workspaceClassesPath,
-    sfdxObjectsStandardPath,
-    sfdxObjectsCustomPath,
     getObjectFileds as getObjectFields,
     formatObjectName,
 } from "../common";
 import path = require("path");
 
 async function updateSelectors(objectName: string) {
-    // const files = await fs.readdir(workspaceClassesPath);
-    // const selectors = files.filter((file) => file.endsWith("Selector.cls"));
-    // for (const selectorFilePath of selectors) {
     const formatedObjectName = formatObjectName(objectName);
     const selectorFileName = `${formatedObjectName}Selector.cls`;
     const selectorFilePath = path.join(workspaceClassesPath, selectorFileName);
