@@ -1,5 +1,6 @@
 {
     "name": "mysf",
+    "publisher": "AndriiSolokh",
     "displayName": "MySF",
     "description": "Personal SF Developer Commands",
     "version": "0.0.1",
@@ -9,6 +10,7 @@
     "categories": [
         "Other"
     ],
+    "repository": "https://github.com/andrii-solokh/MySF",
     "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {

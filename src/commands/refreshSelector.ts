@@ -36,7 +36,6 @@ async function updateSelectors(objectName: string) {
 export default async function refreshSObjects(
     context: vscode.ExtensionContext
 ) {
-    // await vscode.commands.executeCommand("sfdx.force.internal.refreshsobjects");
     const objectName = (await askForObject()) ?? "";
     const selectors = await updateSelectors(objectName);
     await openFiles(selectors);

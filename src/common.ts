@@ -5,9 +5,9 @@ import { promises as fs } from "fs";
 
 export const workspacePath =
     vscode.workspace.workspaceFolders?.[0].uri.fsPath || "";
-export const extensionPath =
-    vscode.extensions.getExtension("undefined_publisher.mysf")?.extensionUri
-        .path || "";
+
+const extensionPath = vscode.extensions.getExtension("AndriiSolokh.mysf")?.extensionPath ?? "";
+
 export const templatesPath = path.join(extensionPath, "src", "templates");
 export const metadataPath = path.join(templatesPath, "metadata");
 export const sourcePath = path.join(templatesPath, "source");
@@ -182,7 +182,6 @@ export async function generateFiles(
 }
 
 export async function openFiles(filePaths: string[]) {
-    vscode.commands.executeCommand("workbench.action.newEditor");
     for (const filePath of filePaths) {
         const doc = await vscode.workspace.openTextDocument(filePath);
         await vscode.window.showTextDocument(doc, {
