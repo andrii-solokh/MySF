@@ -6,9 +6,14 @@ import { promises as fs } from "fs";
 export const workspacePath =
     vscode.workspace.workspaceFolders?.[0].uri.fsPath || "";
 
-const extensionPath = vscode.extensions.getExtension("AndriiSolokh.mysf")?.extensionPath ?? "";
+const extensionPathRoot =
+    vscode.extensions.getExtension("AndriiSolokh.mysf")?.extensionPath ?? "";
+const extensionPath =
+    process.env.NODE_ENV === "development"
+        ? path.join(extensionPathRoot, "out")
+        : extensionPathRoot;
 
-export const templatesPath = path.join(extensionPath, "src", "templates");
+export const templatesPath = path.join(extensionPath, "templates");
 export const metadataPath = path.join(templatesPath, "metadata");
 export const sourcePath = path.join(templatesPath, "source");
 export const sfdxPath = path.join(workspacePath, ".sfdx");

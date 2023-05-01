@@ -5,10 +5,6 @@ import createApexTrigger from "./commands/createApexTrigger";
 import refreshApexSelector from "./commands/refreshSelector";
 
 export function activate(context: vscode.ExtensionContext) {
-    vscode.window.showInformationMessage("MySF extension is active!");
-    vscode.window.showInformationMessage(
-        vscode.extensions.getExtension("AndriiSolokh.mysf")?.extensionPath ?? ""
-    );
     context.subscriptions.push(
         vscode.commands.registerCommand("mysf.createApexSelector", () => {
             createApexSelector(context);
