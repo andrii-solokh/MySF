@@ -8,10 +8,8 @@ export const workspacePath =
 
 const extensionPathRoot =
     vscode.extensions.getExtension("AndriiSolokh.mysf")?.extensionPath ?? "";
-const extensionPath =
-    process.env.NODE_ENV === "development"
-        ? path.join(extensionPathRoot, "out")
-        : extensionPathRoot;
+
+const extensionPath = path.join(extensionPathRoot, "out");
 
 export const templatesPath = path.join(extensionPath, "templates");
 export const metadataPath = path.join(templatesPath, "metadata");
