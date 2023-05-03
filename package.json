@@ -4,7 +4,6 @@
     "displayName": "MySF",
     "description": "Personal SF Developer Commands",
     "icon": "images/MySF-logo.png",
-    "type": "commonjs",
     "version": "0.1.6",
     "engines": {
         "vscode": "^1.77.0"
