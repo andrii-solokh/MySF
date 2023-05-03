@@ -4,7 +4,8 @@
     "displayName": "MySF",
     "description": "Personal SF Developer Commands",
     "icon": "images/MySF-logo.png",
-    "version": "0.1.5",
+    "type": "commonjs",
+    "version": "0.1.6",
     "engines": {
         "vscode": "^1.77.0"
     },
@@ -27,6 +28,10 @@
             {
                 "command": "mysf.refreshApexSelector",
                 "title": "MySF: Refresh Apex Selector"
+            },
+            {
+                "command": "mysf.createFieldType",
+                "title": "MySF: Create Field Type"
             }
         ]
     },
@@ -54,6 +59,6 @@
         "typescript": "^5.0.4"
     },
     "dependencies": {
-        "dotenv": "^16.0.3"
+        "shell-exec": "^1.1.2"
     }
 }

@@ -2,6 +2,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import { promises as fs } from "fs";
+import shellExec from "shell-exec";
 
 export const workspacePath =
     vscode.workspace.workspaceFolders?.[0].uri.fsPath || "";
@@ -29,6 +30,15 @@ export const workspaceClassesPath = path.join(
     "default",
     "classes"
 );
+
+export interface PicklistValue {
+    value: string;
+}
+export interface Field {
+    name: string;
+    type: string;
+    picklistValues: PicklistValue[];
+}
 
 interface FileConfig {
     sourceTemplatePath: string;
@@ -147,6 +157,35 @@ export async function askForObject() {
     return vscode.window.showQuickPick(objectNames);
 }
 
+export async function askForField(
+    objectName: string,
+    filter: (field: Field) => boolean
+): Promise<Field | undefined> {
+    const { stdout } = await shellExec(
+        `sfdx force:schema:sobject:describe -s ${objectName} --json`
+    );
+    const unEscapedJSON = stdout
+        .replace(/\n/g, "")
+        .replace(/\r/g, "")
+        .replace(/\t/g, "");
+    const result = JSON.parse(unEscapedJSON).result;
+    const fields = result.fields as Field[];
+    const fieldNames = fields.filter(filter).map((field: any) => field.name);
+    const recordTypeField = {} as Field;
+    recordTypeField.name = "RecordType";
+    recordTypeField.picklistValues = result.recordTypeInfos.map(
+        (recordType: any) => {
+            return { value: recordType.developerName };
+        }
+    );
+    fieldNames.push("RecordType");
+    const fieldName = await vscode.window.showQuickPick(fieldNames);
+    if (fieldName === "RecordType") {
+        return recordTypeField;
+    }
+    return fields.find((field) => field.name === fieldName);
+}
+
 function getExtension(fileName: string) {
     return "." + path.basename(fileName).split(".").slice(1).join(".");
 }
@@ -237,4 +276,15 @@ export async function getObjectFileds(objectName: string) {
 
 export function formatObjectName(objectName: string): string {
     return objectName.replace("__c", "").replaceAll("_", "");
+}
+
+export function toSnakeCase(str: string) {
+    str =
+        str[0].toLowerCase() +
+        str
+            .slice(1, str.length)
+            .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+    str = str.replaceAll(" _", "_");
+
+    return str.replaceAll(" ", "_").replaceAll("-", "").replaceAll("__", "_");
 }
