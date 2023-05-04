@@ -51,7 +51,7 @@ interface TemplateMetadata {
     destinationPath: string;
 }
 
-type Presets = "Selector" | "Trigger";
+type Presets = "Selector" | "Trigger" | "ORG";
 
 const TEMPLATE_MAPPING: { [K in Presets]: TemplateMetadata } = {
     Selector: {
@@ -133,6 +133,22 @@ const TEMPLATE_MAPPING: { [K in Presets]: TemplateMetadata } = {
                     "ServiceTestTemplate.cls"
                 ),
                 classNameTemplate: "{{NAME}}ServiceTest",
+                metadataTemplatePath: path.join(
+                    metadataTemplatesDirPath,
+                    "ApexClassMetadata.cls-meta.xml"
+                ),
+            },
+        ],
+        destinationPath: workspaceClassesPath,
+    },
+    ORG: {
+        files: [
+            {
+                sourceTemplatePath: path.join(
+                    sourceTemmplatesDirPath,
+                    "ORGTemplate.cls"
+                ),
+                classNameTemplate: "ORG",
                 metadataTemplatePath: path.join(
                     metadataTemplatesDirPath,
                     "ApexClassMetadata.cls-meta.xml"

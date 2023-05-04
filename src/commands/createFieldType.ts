@@ -10,6 +10,7 @@ import {
     formatObjectName,
     toSnakeCase,
     Field,
+    generateFiles,
 } from "../common";
 import path = require("path");
 
@@ -32,7 +33,8 @@ export default async function createTypeForField(
     try {
         orgFileContent = (await fs.readFile(orgFilePath, "utf-8")) as string;
     } catch (error) {
-        orgFileContent = `public class ORG {}`;
+        const [generatedOrgFilePath] = await generateFiles("ORG", "ORG", {});
+        orgFileContent = (await fs.readFile(generatedOrgFilePath, "utf-8")) as string;
     }
 
     orgFileContent = updateFieldType(orgFileContent, objectName, field);
@@ -42,6 +44,7 @@ export default async function createTypeForField(
     orgFileContent = addLastBRIfNeeded(orgFileContent);
 
     await fs.writeFile(orgFilePath, orgFileContent);
+    await openFiles([orgFilePath]);
 }
 
 function addLastBRIfNeeded(content: string) {
