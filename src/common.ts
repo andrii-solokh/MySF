@@ -279,12 +279,14 @@ export function formatObjectName(objectName: string): string {
 }
 
 export function toSnakeCase(str: string) {
-    str =
-        str[0].toLowerCase() +
-        str
-            .slice(1, str.length)
-            .replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
-    str = str.replaceAll(" _", "_");
-
-    return str.replaceAll(" ", "_").replaceAll("-", "").replaceAll("__", "_");
+    return (
+        str &&
+        (
+            str.match(
+                /[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g
+            ) ?? []
+        )
+            .map((x) => x.toLowerCase())
+            .join("_")
+    );
 }
