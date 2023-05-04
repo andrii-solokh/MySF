@@ -177,14 +177,7 @@ export async function askForField(
     objectName: string,
     filter: (field: Field) => boolean
 ): Promise<Field | undefined> {
-    const { stdout } = await shellExec(
-        `sfdx force:schema:sobject:describe -s ${objectName} --json`
-    );
-    const unEscapedJSON = stdout
-        .replace(/\n/g, "")
-        .replace(/\r/g, "")
-        .replace(/\t/g, "");
-    const result = JSON.parse(unEscapedJSON).result;
+    const result = await fetchObjectDescribe(objectName);
     const fields = result.fields as Field[];
     const fieldNames = fields.filter(filter).map((field: any) => field.name);
     const recordTypeField = {} as Field;
@@ -270,6 +263,18 @@ export async function openFiles(filePaths: string[]) {
             preview: false,
         });
     }
+}
+
+export async function fetchObjectDescribe(objectName: string) {
+    const { stdout } = await shellExec(
+        `sfdx force:schema:sobject:describe -s ${objectName} --json`
+    );
+    const unEscapedJSON = stdout
+        .replace(/\n/g, "")
+        .replace(/\r/g, "")
+        .replace(/\t/g, "");
+    const result = JSON.parse(unEscapedJSON).result;
+    return result;
 }
 
 export async function getObjectFileds(objectName: string) {
