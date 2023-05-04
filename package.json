@@ -4,7 +4,7 @@
     "displayName": "MySF",
     "description": "Personal SF Developer Commands",
     "icon": "images/MySF-logo.png",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "engines": {
         "vscode": "^1.77.0"
     },
