@@ -2,16 +2,36 @@
  * @description       : Selector for {{SOBJECT_NAME}} object
  * @author            : andrii.solokh@wipro.com
  * @group             : Core.Selector
- * @last modified on  : 04-30-2023
+ * @last modified on  : 05-04-2023
  * @last modified by  : andrii.solokh@wipro.com
  **/
-public inherited sharing class {{CLASS_NAME}} implements I{{CLASS_NAME}} {
-    
-    public static final List<String> ALL_FIELD_NAMES = new List<String>{
-        {{FIELD_NAMES_QUOTED}}
-    };
-    
-    public {{CLASS_NAME}}() {}
+public inherited sharing class {{CLASS_NAME}} extends AbstractSelector implements I{{CLASS_NAME}} {
+    /**
+     * @description Return list of fields to be queried
+     * @return
+     */
+    public override SObjectType getObject() {
+        return {{SOBJECT_NAME}}.getSObjectType();
+    }
+
+    /**
+     * @description Return SObject type
+     * @return
+     */
+    public override List<SObjectField> getFields() {
+        return new List<SObjectField>{ {{FIELD_NAMES}}};
+    }
+
+    /**
+     * @description Return map of related fields to be queried and related selector from which fields will be taken
+     * @return
+     */
+    public override Map<SObjectField,Type> getIncludedRelatedFields() {
+        return new Map<SObjectField,Type>{};
+    }
+
+    public {{CLASS_NAME}}() {
+    }
 
     /**
      * @description Query record by Id
@@ -19,16 +39,24 @@ public inherited sharing class {{CLASS_NAME}} implements I{{CLASS_NAME}} {
      * @return          
      */
     public {{SOBJECT_NAME}} getById(Id recordId) {
-        String query = 'SELECT ' + String.join(ALL_FIELD_NAMES, ',') + ' FROM Account WHERE Id = :recordId';
-        return Database.query(query);
+        return ({{SOBJECT_NAME}}) getRecordById(recordId);
     }
 
     /**
      * @description Query all records
-     * @return          
+     * @return   
      */
     public List<{{SOBJECT_NAME}}> getAll() {
-        String query = 'SELECT ' + String.join(ALL_FIELD_NAMES, ',') + ' FROM Account';
-        return Database.query(query);
+        return (List<{{SOBJECT_NAME}}>) getAllRecords();
+    }
+
+    /**
+     * @description Query records by field
+     * @param  field 
+     * @param  value 
+     * @return
+     */
+    public List<{{SOBJECT_NAME}}> getByField(SObjectField field, Object value) {
+        return (List<{{SOBJECT_NAME}}>) getRecordsByField(field, value);
     }
 }

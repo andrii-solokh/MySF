@@ -10,14 +10,10 @@ import {
 } from "../common";
 
 async function generateSelector(objectName: string) {
-    const objectDescribe = await fetchObjectDescribe(objectName);
-    const fields = objectDescribe?.fields ?? [];
-    // const allTypes: string[] = ["id", "boolean", "reference", "string", "picklist", "textarea", "double", "address", "phone", "url", "currency", "int", "datetime", "date", "multipicklist", "percent"]
-    const filteredTypes: string[] = ["id", "boolean", "reference", "string", "picklist", "double", "address", "phone", "url", "currency", "int", "datetime", "date", "multipicklist", "percent"]
-    const filteredFields = fields.filter((field: Field) =>
-        filteredTypes.includes(field.type)
+    const filteredFields = await getSelectorFields(objectName);
+    const fieldNames = filteredFields.map(
+        (field: Field) => `${objectName}.${field.name}`
     );
-    const fieldNames = filteredFields.map((field: Field) => field.name);
     const joinedFieldNames = fieldNames?.join(", ") ?? "";
     const joinedFieldNamesQuoted = "'" + fieldNames?.join("', '") + "'" ?? "";
     const formatedObjectName = objectName?.replace("__c", "").replace("__", "");
@@ -29,6 +25,32 @@ async function generateSelector(objectName: string) {
     });
 
     return generatedFiles;
+}
+
+export async function getSelectorFields(objectName: string): Promise<Field[]> {
+    const objectDescribe = await fetchObjectDescribe(objectName);
+    const fields = objectDescribe?.fields ?? [];
+    const filteredTypes: string[] = [
+        "id",
+        "boolean",
+        "reference",
+        "string",
+        "picklist",
+        "double",
+        "address",
+        "phone",
+        "url",
+        "currency",
+        "int",
+        "datetime",
+        "date",
+        "multipicklist",
+        "percent",
+    ];
+    const filteredFields = fields.filter((field: Field) =>
+        filteredTypes.includes(field.type)
+    );
+    return filteredFields;
 }
 
 export default async function createApexSelector(

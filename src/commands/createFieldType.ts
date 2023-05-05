@@ -11,6 +11,9 @@ import {
     toSnakeCase,
     Field,
     generateFiles,
+    insertAfter,
+    insertBetween,
+    replaceBeetween,
 } from "../common";
 import path = require("path");
 
@@ -55,68 +58,6 @@ function addLastBRIfNeeded(content: string) {
     return content;
 }
 
-function insertAfter(content: string, after: string, insertion: string) {
-    if (content.includes(insertion)) {
-        return content;
-    }
-    const index = content.indexOf(after) + after.length;
-    return content.slice(0, index) + "\n\t" + insertion + content.slice(index);
-}
-
-function insertBeforeLast(content: string, before: string, insertion: string) {
-    if (content.includes(insertion)) {
-        return content;
-    }
-    const index = content.lastIndexOf(before);
-    return content.slice(0, index) + insertion + content.slice(index);
-}
-
-function insertBetween(
-    content: string,
-    start: string,
-    end: string,
-    insertion: string
-) {
-    if (content.includes(insertion)) {
-        return content;
-    }
-    const startIndex = content.indexOf(start);
-    const insertContent =
-        "\n\n\t" + start + "\n\t\t" + insertion + "\n\t" + end;
-    if (startIndex === -1) {
-        return insertBeforeLast(content, "}", insertContent);
-    } else {
-        return (
-            content.slice(0, startIndex + start.length) +
-            "\n\t\t" +
-            insertion +
-            content.slice(startIndex + start.length)
-        );
-    }
-}
-
-function replaceBeetween(
-    content: string,
-    start: string,
-    end: string,
-    replacement: string
-) {
-    const startIndex = content.indexOf(start);
-    const insertContent = "\n\t" + start + replacement + "\n\t" + end;
-    if (startIndex === -1) {
-        return insertBeforeLast(content, "}", insertContent);
-    } else {
-        const lineStart = content.slice(0, startIndex).lastIndexOf("}") + 1;
-        const contentAfterSlice = content.slice(startIndex);
-        const endIndex = contentAfterSlice.indexOf(end) + startIndex;
-        return (
-            content.slice(0, lineStart) +
-            "\n" +
-            insertContent +
-            content.slice(endIndex + end.length)
-        );
-    }
-}
 
 function updateObjectType(
     orgFileContent: string,

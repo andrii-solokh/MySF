@@ -7,21 +7,35 @@ import {
     workspaceClassesPath,
     getObjectFileds as getObjectFields,
     formatObjectName,
+    replaceBeetween,
+    Field,
 } from "../common";
 import path = require("path");
+import { getSelectorFields } from "./createApexSelector";
 
 async function updateSelectors(objectName: string) {
     const formatedObjectName = formatObjectName(objectName);
     const selectorFileName = `${formatedObjectName}Selector.cls`;
     const selectorFilePath = path.join(workspaceClassesPath, selectorFileName);
+    const fields = await getSelectorFields(objectName);
+
     let selectorContent = await fs.readFile(selectorFilePath, "utf-8");
-    const fields = (await getObjectFields(objectName)) ?? [];
-    const joinedFields =
-        "\n" + fields.map((field) => `\t\t'${field}'`).join(",\n") + "\n\t";
-    selectorContent = selectorContent.replace(
-        /(?<=ALL_FIELD_NAMES = new List<String>{)(\n|.)*?(?=};)/,
-        joinedFields
+    let fieldsContent = "\n\t\treturn new List<SObjectField>{\n";
+    fieldsContent += fields
+        .map((field: Field) => `\t\t\t${objectName}.${field.name}`)
+        .join(",\n");
+    // fieldsContent += "\n\t\t};";
+
+    selectorContent = replaceBeetween(
+        selectorContent,
+        "public override List<SObjectField> getFields() {",
+        "};",
+        fieldsContent
     );
+    // selectorContent = selectorContent.replace(
+    //     /(?<=ALL_FIELD_NAMES = new List<String>{)(\n|.)*?(?=};)/,
+    //     joinedFields
+    // );
 
     await fs.writeFile(selectorFilePath, selectorContent);
     return [selectorFilePath];
