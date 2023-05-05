@@ -58,6 +58,6 @@ export default async function createApexSelector(
     context: vscode.ExtensionContext
 ) {
     const selectedObjectName = (await askForObject()) || "";
-    const generatedFiles = await generateSelector(selectedObjectName);
+    const generatedFiles = await generateSelector(selectedObjectName) || [];
     await openFiles(generatedFiles);
 }
