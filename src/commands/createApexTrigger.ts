@@ -16,6 +16,7 @@ export default async function createApexTrigger(
     context: vscode.ExtensionContext
 ) {
     const selectedObjectName = (await askForObject()) || "";
+    if (!selectedObjectName) { return; }
     const generatedFiles = await generateTrigger(selectedObjectName);
     await openFiles(generatedFiles);
 }

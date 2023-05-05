@@ -10,13 +10,14 @@ import {
 } from "../common";
 
 async function generateSelector(objectName: string) {
+    if (!objectName) { return; }
     const filteredFields = await getSelectorFields(objectName);
     const fieldNames = filteredFields.map(
         (field: Field) => `${objectName}.${field.name}`
     );
     const joinedFieldNames = fieldNames?.join(", ") ?? "";
     const joinedFieldNamesQuoted = "'" + fieldNames?.join("', '") + "'" ?? "";
-    const formatedObjectName = objectName?.replace("__c", "").replace("__", "");
+    const formatedObjectName = objectName?.replace("__c", "").replaceAll("_", "");
 
     const generatedFiles = await generateFiles(formatedObjectName, "Selector", {
         FIELD_NAMES: joinedFieldNames,
